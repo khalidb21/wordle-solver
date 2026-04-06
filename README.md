@@ -1,4 +1,4 @@
-# wordle-solver
+# AI Wordle Solver
 
 ## Create Venv
 python -m venv venv
@@ -10,7 +10,7 @@ venv\Scripts\Activate.ps1
 source venv/bin/activate
 
 ## Install Dependencies
-python -m pip install pygame wordfreq
+pip install -r requirements.txt
 
 ## Run Program
 python ui.py
