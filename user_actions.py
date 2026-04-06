@@ -1,4 +1,5 @@
 # user_actions.py
+from words import WORD_LIST
 
 def set_tuples(guess, target, green, yellow, grey):
     result = check_guess(guess, target)
@@ -41,7 +42,7 @@ def handle_key(event, current_guess):
         return current_guess[:-1], False
 
     elif event.key == 13:  # enter
-        if len(current_guess) == 5:
+        if len(current_guess) == 5 and current_guess in WORD_LIST:
             return current_guess, True
         return current_guess, False
 
