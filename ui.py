@@ -1,5 +1,5 @@
 import pygame
-from user_actions import handle_key, check_guess
+from user_actions import handle_key, check_guess, set_tuples
 from words import get_random_word
 
 pygame.init()
@@ -22,6 +22,8 @@ COLORS = {
     "empty": (200, 200, 200)
 }
 
+green, yellow, grey = [], [], []
+
 # Reset function
 def reset_game():
     return {
@@ -29,7 +31,7 @@ def reset_game():
         "guesses": [],
         "feedback": [],
         "current_guess": "",
-        "letter_status": {}
+        "letter_status": {},
     }
 
 game = reset_game()
@@ -56,6 +58,10 @@ while running:
                 game["guesses"].append(guess)
 
                 result = check_guess(guess, game["target_word"])
+                green, yellow, grey = set_tuples(guess, game["target_word"], green, yellow, grey)
+                print("Green:", green)
+                print("Yellow:", yellow)
+                print("Grey:", grey)
                 game["feedback"].append(result)
 
                 # Update letter status
@@ -83,6 +89,7 @@ while running:
             if button_rect.collidepoint(event.pos):
                 game = reset_game()
                 print("New word:", game["target_word"])
+                green, yellow, grey = [], [], []
 
     # Draw grid
     for row in range(ROWS):

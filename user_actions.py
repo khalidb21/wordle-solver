@@ -1,5 +1,22 @@
 # user_actions.py
 
+def set_tuples(guess, target, green, yellow, grey):
+    result = check_guess(guess, target)
+
+    for i, (letter, color) in enumerate(zip(guess, result)):
+        if color == "green":
+            if (letter, i) not in green:
+                green.append((letter, i))
+        elif color == "yellow":
+            if (letter, i) not in yellow:
+                yellow.append((letter, i))
+        elif color == "gray":
+            if letter not in grey:
+                grey.append(letter)
+
+    return green, yellow, grey
+
+
 def check_guess(guess, target):
     result = ["gray"] * 5
     target_list = list(target)
