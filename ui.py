@@ -1,10 +1,11 @@
 import pygame
-from user_actions import handle_key, check_guess, set_tuples
+from user_actions import handle_key, check_guess
 from words import get_random_word
+from minimax import MinimaxSolver
 
 pygame.init()
 
-WIDTH, HEIGHT = 500, 800
+WIDTH, HEIGHT = 500, 850
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Wordle")
 
@@ -22,9 +23,7 @@ COLORS = {
     "empty": (200, 200, 200)
 }
 
-green, yellow, grey = [], [], []
 
-# Reset function
 def reset_game():
     return {
         "target_word": get_random_word(),
@@ -32,42 +31,48 @@ def reset_game():
         "feedback": [],
         "current_guess": "",
         "letter_status": {},
+        "solver": None,
+        "ai_mode": False,
+        "last_guess": None,
+        "last_feedback": None,
+        "ai_thinking": False
     }
 
+
 game = reset_game()
-print("Target word:", game["target_word"])  # debug
+print("Target word:", game["target_word"])
+
+clock = pygame.time.Clock()
+
+AI_DELAY = 500
+last_ai_time = 0
 
 running = True
 
 while running:
     screen.fill((255, 255, 255))
 
-    # Restart button (define each frame)
-    button_rect = pygame.Rect(150, 730, 200, 40)
+    restart_button = pygame.Rect(50, 780, 150, 40)
+    ai_button = pygame.Rect(300, 780, 150, 40)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        # Keyboard input
-        if event.type == pygame.KEYDOWN:
+        # Manual input
+        if event.type == pygame.KEYDOWN and not game["ai_mode"]:
             game["current_guess"], submitted = handle_key(event, game["current_guess"])
 
             if submitted and len(game["guesses"]) < 6:
                 guess = game["current_guess"]
-                game["guesses"].append(guess)
-
                 result = check_guess(guess, game["target_word"])
-                green, yellow, grey = set_tuples(guess, game["target_word"], green, yellow, grey)
-                print("Green:", green)
-                print("Yellow:", yellow)
-                print("Grey:", grey)
+
+                game["guesses"].append(guess)
                 game["feedback"].append(result)
 
-                # Update letter status
+                # update keyboard colors
                 for i, letter in enumerate(guess):
                     color = result[i]
-
                     if letter not in game["letter_status"]:
                         game["letter_status"][letter] = color
                     else:
@@ -76,20 +81,62 @@ while running:
                         elif color == "yellow" and game["letter_status"][letter] != "green":
                             game["letter_status"][letter] = "yellow"
 
-                # Win/Lose messages
-                if guess == game["target_word"]:
-                    print("You win!")
-                elif len(game["guesses"]) == 6:
-                    print("You lose! Word was:", game["target_word"])
-
                 game["current_guess"] = ""
 
-        # Mouse click (restart)
+        # Buttons
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if button_rect.collidepoint(event.pos):
+            if restart_button.collidepoint(event.pos):
                 game = reset_game()
                 print("New word:", game["target_word"])
-                green, yellow, grey = [], [], []
+
+            if ai_button.collidepoint(event.pos):
+                game["solver"] = MinimaxSolver()
+                game["ai_mode"] = True
+                game["last_guess"] = None
+                game["last_feedback"] = None
+                game["ai_thinking"] = True
+
+    # AI step
+    if game["ai_mode"] and len(game["guesses"]) < 6:
+        current_time = pygame.time.get_ticks()
+
+        if current_time - last_ai_time > AI_DELAY:
+            last_ai_time = current_time
+
+            game["ai_thinking"] = True
+
+            guess = game["solver"].next_guess(
+                game["last_guess"],
+                game["last_feedback"]
+            )
+
+            result = check_guess(guess, game["target_word"])
+
+            game["guesses"].append(guess)
+            game["feedback"].append(result)
+
+            # update keyboard colors
+            for i, letter in enumerate(guess):
+                color = result[i]
+                if letter not in game["letter_status"]:
+                    game["letter_status"][letter] = color
+                else:
+                    if color == "green":
+                        game["letter_status"][letter] = "green"
+                    elif color == "yellow" and game["letter_status"][letter] != "green":
+                        game["letter_status"][letter] = "yellow"
+
+            game["last_guess"] = guess
+            game["last_feedback"] = result
+
+            game["ai_thinking"] = False
+
+            if guess == game["target_word"]:
+                print("AI solved it!")
+                game["ai_mode"] = False
+            elif len(game["guesses"]) == 6:
+                print("AI failed! Word was:", game["target_word"])
+                game["ai_mode"] = False
 
     # Draw grid
     for row in range(ROWS):
@@ -115,7 +162,7 @@ while running:
 
     # Draw keyboard
     keyboard_rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
-    start_y = HEIGHT - 220
+    start_y = HEIGHT - 260
 
     for row_index, row in enumerate(keyboard_rows):
         for col_index, letter in enumerate(row):
@@ -132,13 +179,21 @@ while running:
             text = SMALL_FONT.render(letter.upper(), True, (0, 0, 0))
             screen.blit(text, (x + 5, y + 5))
 
-    # Draw restart button
-    pygame.draw.rect(screen, (180, 180, 180), button_rect)
-    pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)
+    # Restart button
+    pygame.draw.rect(screen, (180, 180, 180), restart_button)
+    pygame.draw.rect(screen, (0, 0, 0), restart_button, 2)
+    screen.blit(SMALL_FONT.render("Restart", True, (0, 0, 0)), (restart_button.x + 30, restart_button.y + 5))
 
-    button_text = SMALL_FONT.render("Restart", True, (0, 0, 0))
-    screen.blit(button_text, (button_rect.x + 50, button_rect.y + 5))
+    # AI button
+    pygame.draw.rect(screen, (150, 200, 150), ai_button)
+    pygame.draw.rect(screen, (0, 0, 0), ai_button, 2)
+    screen.blit(SMALL_FONT.render("Solve AI", True, (0, 0, 0)), (ai_button.x + 20, ai_button.y + 5))
+
+    # AI thinking text
+    if game["ai_thinking"]:
+        screen.blit(SMALL_FONT.render("AI Thinking...", True, (0, 0, 0)), (170, 10))
 
     pygame.display.update()
+    clock.tick(60)
 
 pygame.quit()
