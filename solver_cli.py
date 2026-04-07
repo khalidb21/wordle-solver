@@ -34,7 +34,7 @@ def solver_solves_random():
         guess = solver.get_best_guess(possible_words)
         feedback = solver.get_feedback_pattern(guess, target)
 
-        print(f"Attempt {attempt + 1}: {guess.upper()}")
+        print(f"Attempt {attempt + 1}: {guess}")
         print(display_feedback(guess, feedback))
 
         if guess == target:
@@ -72,7 +72,7 @@ def solver_solves_user_word():
         guess = solver.get_best_guess(possible_words)
         feedback = solver.get_feedback_pattern(guess, user_word)
 
-        print(f"Attempt {attempt + 1}: {guess.upper()}")
+        print(f"Attempt {attempt + 1}: {guess}")
         print(display_feedback(guess, feedback))
 
         if guess == user_word:
