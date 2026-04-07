@@ -20,7 +20,7 @@ class WordleSolver:
         self.pattern_cache = {}
 
     # Feedback pattern calculation with caching
-    # Uses guess and target to calculate feedback pattern (green/yellow/gray) for each letter
+    # Uses guess and target word (unknown) to calculate feedback pattern (green/yellow/gray) for each letter
     # Ex. feedback = ("green", "gray", "yellow", "gray", "yellow")
     def get_feedback_pattern(self, guess, target):
         
@@ -29,6 +29,7 @@ class WordleSolver:
         if key in self.pattern_cache:
             return self.pattern_cache[key]
 
+        # Fill the tuple with "gray" by default, then update to "green" and "yellow" as needed
         result = ["gray"] * 5
         target_chars = list(target)
 
@@ -55,19 +56,25 @@ class WordleSolver:
             if self.get_feedback_pattern(guess, word) == feedback
         ]
 
-    # Entropy calculation for a guess
-    # Used with list of possible words to calculate the expected information gain when guessing
-    # Entropy is used to measure the expected information gain from a guess\
+    # Entropy calculation for a guess - Used with list of possible words to calculate the expected information gain when guessing
+    # Entropy: average level of expected information gain from a guess using possible words as target pool
+    # Measured in bits - 1 bit would cut the possible candidate pool in half, 2 bits would cut it to a quarter, etc.
     def calculate_entropy(self, guess, words):
+
+        # this dictionary works as a bucket to group words based on colour patterns
         pattern_counts = defaultdict(int)
 
         for target in words:
             pattern = self.get_feedback_pattern(guess, target)
             pattern_counts[pattern] += 1
 
+        # number of possible target words, used to calculate probabilities for each feedback pattern
         total = len(words)
         entropy = 0
 
+        # Shannon Entropy formula: H(X) = -Σ p(x) log2 p(x)
+        # p is probability of each feedback pattern
+        # log2(p) is used to measure information gain in bits - how much the guess would reduce the candidate pool on average
         for count in pattern_counts.values():
             p = count / total
             entropy -= p * math.log2(p)
@@ -82,6 +89,7 @@ class WordleSolver:
 
         # Dynamic candidate reduction
         # switch to only possible answers to prioritize a winning guess as the pool shrinks
+        # number is abitrary
         if len(possible_words) > 100:
             candidates = self.all_words
         else:
