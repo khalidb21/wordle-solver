@@ -4,6 +4,8 @@ from words import WORD_LIST
 
 
 class WordleSolver:
+
+    # First initialize the solver with input of valid words
     def __init__(self, word_list=None):
         self.possible_words = word_list or WORD_LIST
         self.all_words = self.possible_words.copy()
@@ -83,38 +85,6 @@ class WordleSolver:
 
         return best_word
 
-    # Main solving loop to demonstrate the solver's capabilities
-    def solve(self, target_word, verbose=True):
-        possible_words = self.possible_words.copy()
-
-        for attempt in range(6):
-            guess = self.get_best_guess(possible_words)
-
-            if guess is None:
-                print("No valid words left!")
-                return -1
-
-            feedback = self.get_feedback_pattern(guess, target_word)
-
-            if verbose:
-                print(f"Attempt {attempt + 1}: {guess.upper()}")
-                print(f"  Feedback: {feedback}")
-                print(f"  Remaining: {len(possible_words)}")
-
-            if guess == target_word:
-                if verbose:
-                    print(f"✓ Solved in {attempt + 1} guesses!")
-                return attempt + 1
-
-            possible_words = self.filter_words(guess, feedback, possible_words)
-
-            if verbose and len(possible_words) <= 10:
-                print(f"  Candidates: {possible_words}")
-                print()
-
-        print(f"✗ Failed. Target was: {target_word}")
-        return -1
-
     # Get words with highest entropy for display
     def get_top_guesses(self, possible_words, n=5):
         results = []
@@ -125,24 +95,3 @@ class WordleSolver:
 
         results.sort(key=lambda x: x[1], reverse=True)
         return results[:n]
-
-
-# Test demo for the solver
-def demo():
-    import random
-
-    solver = WordleSolver()
-    target = random.choice(solver.possible_words)
-
-    print("=" * 50)
-    print("WORDLE SOLVER DEMO (Optimized)")
-    print("=" * 50)
-    print("Target word is hidden...\n")
-
-    solver.solve(target)
-
-    print("\nActual word:", target.upper())
-
-
-if __name__ == "__main__":
-    demo()
