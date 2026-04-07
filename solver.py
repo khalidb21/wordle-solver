@@ -1,6 +1,8 @@
 # solver.py
 # Uses information theory (entropy) to select optimal guesses based on feedback patterns, and dynamically narrows down the 
 # candidate pool as the game progresses
+# Input: list of possible words to guess, feedback patterns to filter list (green/yellow/gray)
+# Output: best guess based on entropy, and filtered list of possible words
 
 import math
 from collections import defaultdict
