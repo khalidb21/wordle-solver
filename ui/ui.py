@@ -1,5 +1,5 @@
 import pygame
-from user_actions import handle_key, check_guess
+from ui.user_actions import handle_key, check_guess
 from words import get_random_word
 from solver import WordleSolver
 
