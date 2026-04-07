@@ -11,3 +11,14 @@ WORD_LIST = get_word_list()
 
 def get_random_word():
     return random.choice(WORD_LIST)
+
+# check_words.py
+from words import WORD_LIST
+
+def main():
+    print(f"Number of valid 5-letter words: {len(WORD_LIST)}\n")
+    print("List of words:")
+    print(WORD_LIST)
+
+if __name__ == "__main__":
+    main()
