@@ -59,7 +59,7 @@ class WordleSolver:
         ]
 
     # Entropy calculation for a guess - Used with list of possible words to calculate the expected information gain when guessing
-    # Entropy: average level of expected information gain from a guess using possible words as target pool
+    # Entropy: average level of expected information gain from a guess using first all words and then possible words as target pool
     # Measured in bits - 1 bit would cut the possible candidate pool in half, 2 bits would cut it to a quarter, etc.
     def calculate_entropy(self, guess, words):
 
