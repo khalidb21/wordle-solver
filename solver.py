@@ -64,8 +64,8 @@ class WordleSolver:
         # this dictionary works as a bucket to group words based on colour patterns
         pattern_counts = defaultdict(int)
 
-        for target in words:
-            pattern = self.get_feedback_pattern(guess, target)
+        for candidate in words:
+            pattern = self.get_feedback_pattern(guess, candidate)
             pattern_counts[pattern] += 1
 
         # number of possible target words, used to calculate probabilities for each feedback pattern
