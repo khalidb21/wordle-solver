@@ -74,7 +74,6 @@ class WordleSolver:
 
         # Shannon Entropy formula: H(X) = -Σ p(x) log2 p(x)
         # p is probability of each feedback pattern
-        # log2(p) is used to measure information gain in bits - how much the guess would reduce the candidate pool on average
         for count in pattern_counts.values():
             p = count / total
             entropy -= p * math.log2(p)
