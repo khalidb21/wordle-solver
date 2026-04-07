@@ -90,7 +90,7 @@ class WordleSolver:
         # Dynamic candidate reduction
         # switch to only possible answers to prioritize a winning guess as the pool shrinks
         # number is abitrary
-        if len(possible_words) > 100:
+        if len(possible_words) > 50:
             candidates = self.all_words
         else:
             candidates = possible_words
