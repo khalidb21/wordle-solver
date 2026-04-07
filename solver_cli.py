@@ -1,11 +1,12 @@
 # solver_cli.py
+# Command-line interface for demonstrating the WordleSolver
+# Options: 1) Watch the solver solve a random word, 2) Show best starting words based on entropy, 3) Solve a user-provided word, 4) Exit
 
 from solver import WordleSolver
 from words import get_random_word, WORD_LIST
 
-
+# display guess with colored feedback symbols (green/yellow/gray) for each letter
 def display_feedback(guess, feedback):
-    """Display a guess with colored feedback."""
     feedback_symbols = {
         "green": "🟩",
         "yellow": "🟨",
@@ -17,9 +18,8 @@ def display_feedback(guess, feedback):
         for letter, color in zip(guess.upper(), feedback)
     )
 
-
+# Attempts to solve a random target word, showing the process step-by-step
 def solver_solves_random():
-    """Solver attempts to solve a random word."""
     solver = WordleSolver()
     target = get_random_word()
 
@@ -48,9 +48,8 @@ def solver_solves_random():
 
     print(f"✗ Failed! Target was: {target.upper()}")
 
-
+# Attempts to solve a user-provided target word, showing the process step-by-step
 def solver_solves_user_word():
-    """Solver attempts to solve a word provided by the user."""
     solver = WordleSolver()
 
     while True:
@@ -88,8 +87,8 @@ def solver_solves_user_word():
     print(f"✗ Failed! Target was: {user_word.upper()}")
 
 
+# Display best starting words based on their entropy values + expected remaining candidates after the first guess
 def show_best_starting_words():
-    """Display the best starting words ranked by entropy."""
     solver = WordleSolver()
 
     print("\n" + "=" * 60)
@@ -113,7 +112,7 @@ def show_best_starting_words():
 
 
 def main():
-    """Main menu for the solver CLI."""
+    # Main menu loop for user interaction
     while True:
         print("\n" + "=" * 60)
         print("WORDLE SOLVER - Information Theory Edition")
